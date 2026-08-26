@@ -81,9 +81,41 @@ Generates packaged desktop installer in `dist\CodeForge Setup 1.0.0.exe`.
 
 ---
 
+## 🐳 Docker Container Deployment
+
+CodeForge includes a multi-stage `Dockerfile` and `.dockerignore` for containerized web IDE preview and isolated script sandboxing:
+
+```bash
+# Build Docker image
+docker build -t spvm3-code-editor .
+
+# Run container on port 8080
+docker run -d -p 8080:80 --name codeforge-ide spvm3-code-editor
+```
+Access the web editor preview at `http://localhost:8080`.
+
+---
+
+## 🔒 Privacy & Data Security
+
+SPVM3 CodeForge is engineered as a **local-first** environment:
+- **Zero Telemetry**: No tracking, analytics cookies, or crash reports sent externally.
+- **Local AI (Ollama)**: Code completions, prompt fixes, and vector symbol search operate 100% locally.
+- **Data Sovereignty**: For full details, see [`PRIVACY.md`](file:///c:/Users/Sanjay%20G%20L/Desktop/codeforge/PRIVACY.md).
+
+---
+
+## 📜 Governance & Policies
+
+- **Terms of Use**: Distributed under the MIT License ([`POLICIES.md`](file:///c:/Users/Sanjay%20G%20L/Desktop/codeforge/POLICIES.md)).
+- **Subprocess Isolation**: Supports containerized script execution via Docker.
+
+---
+
 ## ⌨️ Keyboard Shortcuts
 
 - `Ctrl + Shift + P`: Command Palette Modal
 - `Ctrl + S`: Save Active File
 - `F5` / `Ctrl + R`: Execute Active Code File
 - `Ctrl + \``: Toggle Integrated Terminal / Bottom Panel
+

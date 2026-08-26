@@ -224,10 +224,50 @@ export default function Sidebar({
         <div className="sidebar-view">
           <div className="sidebar-header">
             <h3>Docker Containers</h3>
+            <button className="icon-btn" title="Refresh Docker Containers" onClick={() => onOpenFile?.('Dockerfile')}>
+              <RefreshCw size={14} />
+            </button>
           </div>
-          <div className="empty-sidebar">
-            <Container size={28} color="var(--text-muted)" />
-            <p>Docker Engine ready. No active containers running in workspace.</p>
+          <div className="docker-panel" style={{ padding: '12px' }}>
+            <div className="ext-card active" style={{ marginBottom: '12px' }}>
+              <div className="ext-card-header">
+                <Container size={18} color="var(--accent-primary)" />
+                <h4>SPVM3 Docker Containerfile</h4>
+              </div>
+              <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: '6px 0 10px 0' }}>
+                Multi-stage container setup configured in <code>Dockerfile</code>. Build or preview containerized web IDE.
+              </p>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                <button
+                  className="btn-action primary"
+                  style={{ padding: '4px 8px', fontSize: '11px' }}
+                  onClick={() => onOpenFile?.('Dockerfile')}
+                >
+                  Edit Dockerfile
+                </button>
+                <button
+                  className="btn-action"
+                  style={{ padding: '4px 8px', fontSize: '11px' }}
+                  onClick={() => onOpenFile?.('.dockerignore')}
+                >
+                  .dockerignore
+                </button>
+              </div>
+            </div>
+
+            <div className="settings-section">
+              <label>Build Command</label>
+              <code style={{ display: 'block', padding: '6px', background: 'var(--bg-tertiary)', borderRadius: '4px', fontSize: '11px', color: 'var(--accent-primary)' }}>
+                docker build -t spvm3-code-editor .
+              </code>
+            </div>
+
+            <div className="settings-section" style={{ marginTop: '10px' }}>
+              <label>Container Sandboxing</label>
+              <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                Runs isolated execution containers for testing untrusted user scripts securely.
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -271,6 +311,29 @@ export default function Sidebar({
               </ul>
             </div>
           )}
+
+          <div className="settings-section" style={{ marginTop: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
+            <label>Privacy & Compliance</label>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+              SPVM3 operates 100% local-first. Zero external tracking or telemetry.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <button
+                className="btn-action"
+                style={{ textAlign: 'left', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                onClick={() => onOpenFile?.('PRIVACY.md')}
+              >
+                <FileText size={12} /> View Privacy Policy (PRIVACY.md)
+              </button>
+              <button
+                className="btn-action"
+                style={{ textAlign: 'left', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                onClick={() => onOpenFile?.('POLICIES.md')}
+              >
+                <FileText size={12} /> View Terms & Policies (POLICIES.md)
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
