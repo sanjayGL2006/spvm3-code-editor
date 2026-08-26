@@ -1,0 +1,38 @@
+{
+  "name": "spvm3",
+  "version": "1.0.0",
+  "description": "SPVM3 Code Editor — Advanced Windows Desktop IDE & Local-First AI Development Environment",
+  "main": "electron/main.js",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k --success command-electron:dev \"vite\" \"npm:electron:dev\"",
+    "electron:dev": "wait-on tcp:5173 && cross-env NODE_ENV=development electron .",
+    "build:vite": "vite build",
+    "build": "npm run build:vite && electron-builder",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
+    "lucide-react": "^0.383.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^30.0.9",
+    "electron-builder": "^24.13.3",
+    "vite": "^5.3.1",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.codeforge.app",
+    "productName": "CodeForge",
+    "files": ["dist/**/*", "electron/**/*"],
+    "directories": { "buildResources": "build" },
+    "mac": { "category": "public.app-category.developer-tools" },
+    "win": { "target": "nsis" },
+    "linux": { "target": "AppImage" }
+  }
+}
