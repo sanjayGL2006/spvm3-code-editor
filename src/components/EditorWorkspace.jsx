@@ -94,6 +94,12 @@ export default function EditorWorkspace({
             language={langFor(activeFile.name)}
             value={activeFile.content}
             onChange={(value) => onChange(activeFile.path, value ?? '')}
+            loading={
+              <div className="monaco-loading-indicator">
+                <div className="monaco-spinner" />
+                <span>Loading Editor…</span>
+              </div>
+            }
             options={{
               fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
               fontSize: 13,

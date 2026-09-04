@@ -80,14 +80,23 @@ export default function App() {
 
   const handleFileClick = useCallback(
     async (node) => {
+      if (!node || !node.path) return;
       const existing = openTabs.find((t) => t.path === node.path);
       if (existing) {
         setActiveTab(node.path);
         return;
       }
       try {
-        const content = await window.spvm3.readFile(node.path);
-        setOpenTabs((prev) => [...prev, { path: node.path, name: node.name, content, dirty: false }]);
+        let content = '';
+        if (window.spvm3) {
+          content = await window.spvm3.readFile(node.path);
+        } else {
+          content = `// ${node.name}\n// Local preview mode\n`;
+        }
+        setOpenTabs((prev) => {
+          if (prev.some((t) => t.path === node.path)) return prev;
+          return [...prev, { path: node.path, name: node.name, content: content ?? '', dirty: false }];
+        });
         setActiveTab(node.path);
       } catch (err) {
         console.error('Failed to open file:', node.path, err);
@@ -98,15 +107,47 @@ export default function App() {
 
   const handleCreateFile = useCallback(
     async (dirPath, isDir) => {
-      if (!window.spvm3) return;
       const targetDir = dirPath || projectRoot;
-      if (!targetDir) return;
+
+      // If creating a file with no project folder opened, open an untitled tab immediately
+      if (!isDir && !targetDir) {
+        const untitledCount = openTabs.filter((t) => t.path.startsWith('untitled:')).length + 1;
+        const untitledName = `Untitled-${untitledCount}.js`;
+        const untitledPath = `untitled:${untitledName}`;
+        setOpenTabs((prev) => [
+          ...prev,
+          { path: untitledPath, name: untitledName, content: '// New File\nconsole.log("Hello from SPVM3 Code Editor!");\n', dirty: true }
+        ]);
+        setActiveTab(untitledPath);
+        return;
+      }
+
       const name = prompt(isDir ? 'Enter new folder name:' : 'Enter new file name:');
-      if (!name) return;
-      await window.spvm3.createFile(targetDir, name, isDir);
-      handleRefreshProject();
+      if (!name || !name.trim()) return;
+      const cleanName = name.trim();
+
+      if (window.spvm3 && targetDir) {
+        try {
+          const createdPath = await window.spvm3.createFile(targetDir, cleanName, isDir);
+          await handleRefreshProject();
+          if (!isDir) {
+            const fullPath = createdPath || `${targetDir}/${cleanName}`;
+            setOpenTabs((prev) => {
+              if (prev.some((t) => t.path === fullPath)) return prev;
+              return [...prev, { path: fullPath, name: cleanName, content: '', dirty: false }];
+            });
+            setActiveTab(fullPath);
+          }
+        } catch (err) {
+          console.error('Failed to create file:', err);
+        }
+      } else if (!isDir) {
+        const virtualPath = `virtual/${cleanName}`;
+        setOpenTabs((prev) => [...prev, { path: virtualPath, name: cleanName, content: '', dirty: false }]);
+        setActiveTab(virtualPath);
+      }
     },
-    [projectRoot, handleRefreshProject]
+    [projectRoot, handleRefreshProject, openTabs]
   );
 
   const handleDeleteFile = useCallback(
@@ -149,12 +190,32 @@ export default function App() {
   }, []);
 
   const handleSaveFile = useCallback(async () => {
-    if (!activeTab || !window.spvm3) return;
+    if (!activeTab) return;
     const tab = openTabs.find((t) => t.path === activeTab);
     if (!tab) return;
-    await window.spvm3.writeFile(tab.path, tab.content);
-    setOpenTabs((prev) => prev.map((t) => (t.path === tab.path ? { ...t, dirty: false } : t)));
-  }, [activeTab, openTabs]);
+
+    if (tab.path.startsWith('untitled:')) {
+      if (window.spvm3 && projectRoot) {
+        const name = prompt('Save new file as:', tab.name.replace(/^Untitled-\d+/, 'script.js'));
+        if (!name || !name.trim()) return;
+        const targetPath = `${projectRoot}/${name.trim()}`;
+        await window.spvm3.writeFile(targetPath, tab.content);
+        setOpenTabs((prev) =>
+          prev.map((t) => (t.path === tab.path ? { path: targetPath, name: name.trim(), content: tab.content, dirty: false } : t))
+        );
+        setActiveTab(targetPath);
+        handleRefreshProject();
+      } else {
+        setOpenTabs((prev) => prev.map((t) => (t.path === tab.path ? { ...t, dirty: false } : t)));
+      }
+      return;
+    }
+
+    if (window.spvm3) {
+      await window.spvm3.writeFile(tab.path, tab.content);
+      setOpenTabs((prev) => prev.map((t) => (t.path === tab.path ? { ...t, dirty: false } : t)));
+    }
+  }, [activeTab, openTabs, projectRoot, handleRefreshProject]);
 
   // Code Runner Action
   const handleRunCode = useCallback(async () => {

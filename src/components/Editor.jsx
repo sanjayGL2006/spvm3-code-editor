@@ -52,6 +52,12 @@ export default function Editor({ openTabs, activeTab, activeTheme, onSelectTab, 
           language={langFor(active.name)}
           value={active.content}
           onChange={(value) => onChange(active.path, value ?? '')}
+          loading={
+            <div className="monaco-loading-indicator">
+              <div className="monaco-spinner" />
+              <span>Loading Editor…</span>
+            </div>
+          }
           options={{
             fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
             fontSize: 13,

@@ -9,7 +9,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Install system dependencies needed for native modules
-RUN apk add --no-libc6-compat python3 make g++ git
+RUN apk add --no-cache python3 make g++ git libc6-compat
 
 # Copy package descriptors
 COPY package*.json ./
@@ -21,7 +21,7 @@ RUN npm ci
 COPY . .
 
 # Build production web bundle (Vite)
-RUN npm run build
+RUN npm run build:vite
 
 # --- Stage 2: Web Preview & Runner Environment ---
 FROM nginx:alpine-slim AS runner

@@ -154,7 +154,7 @@ export default function Sidebar({
               <div className="root-folder-tag">{projectName}</div>
               {tree.map((node) => (
                 <TreeNode
-                  key={childPath(node)}
+                  key={node.path}
                   node={node}
                   activePath={activePath}
                   onFileClick={onFileClick}
